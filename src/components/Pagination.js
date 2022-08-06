@@ -1,10 +1,22 @@
 import axios from "axios";
 import { useState, useEffect } from "react";
+import styled from "styled-components";
+
+const Modal = styled.div`
+  height: 20px;
+  color: red;
+  background-color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+`;
 
 const Pagination = () => {
   const [comments, setComments] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [recordsPerPage] = useState(50);
+  const [modal, setModal] = useState(false);
   useEffect(() => {
     const fetchData = async () => {
       const response = await axios.get(
@@ -17,11 +29,29 @@ const Pagination = () => {
 
   const indexOfLastRecord = currentPage * recordsPerPage;
   const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
-  const currentRecords = comments?.slice(indexOfFirstRecord, indexOfLastRecord);
+  let currentRecords = comments?.slice(indexOfFirstRecord, indexOfLastRecord);
   const nPages = Math.ceil(comments.length / recordsPerPage);
+
+  const deleteRecord = (id) => {
+    let updatedList = currentRecords.filter((record) => {
+      return id !== record.id;
+    });
+    setComments(updatedList);
+    currentRecords = comments?.slice(indexOfFirstRecord, indexOfLastRecord);
+    setModal(true);
+  };
+
+  useEffect(() => {
+    let timeout = setTimeout(() => {
+      setModal(false);
+    }, 3000);
+    return () => clearTimeout(timeout);
+  }, [comments]);
+
   return (
     <div>
-      <Records comments={currentRecords} />
+      {modal && <Modal>Item Deleted!!</Modal>}
+      <Records comments={currentRecords} deleteRecord={deleteRecord} />
       <Paginate
         nPages={nPages}
         currentPage={currentPage}
@@ -41,6 +71,7 @@ const Records = (props) => {
           <th className="col">Id</th>
           <th className="col">Name</th>
           <th className="col">Email</th>
+          <th className="col">Action</th>
         </tr>
       </thead>
       <tbody>
@@ -50,6 +81,11 @@ const Records = (props) => {
               <td>{comment.id}</td>
               <td>{comment.name}</td>
               <td>{comment.email}</td>
+              <td>
+                <button onClick={() => props.deleteRecord(comment.id)}>
+                  -
+                </button>
+              </td>
             </tr>
           );
         })}

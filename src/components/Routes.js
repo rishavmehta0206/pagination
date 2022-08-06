@@ -4,10 +4,11 @@ import {NavLink} from "react-router-dom"
 
 const Container = styled.div`
   height: 70px;
+  background-color: red;
 `;
 const Wrapper = styled.div`
   padding: 10px;
-  margin-top: 20px;
+  height: 100%;
   display: flex;
   align-items: center;
   background-color: black;
@@ -27,6 +28,7 @@ const Routes = () => {
       <Wrapper>
         <NavLink to="/">Home</NavLink>
         <NavLink to="/form">Form</NavLink>
+        <NavLink to="/products">Product</NavLink>
       </Wrapper>
     </Container>
   );
